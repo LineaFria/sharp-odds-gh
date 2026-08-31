@@ -6,6 +6,8 @@ name: scrape-sharp-odds
 
 on:
   workflow_dispatch:        # correr a mano desde la pestaña Actions
+  push:
+    branches: [main]        # dispara en cada push (el commit del bot NO re-dispara: GH lo evita)
   schedule:
     - cron: "20 */3 * * *"  # cada 3h (UTC). Ajustable cuando el extractor funcione.
 
