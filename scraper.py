@@ -79,9 +79,46 @@ EXTRACT_JS = r"""
 """
 
 
+# stealth: oculta señales de automatización que sitios como OddsPortal usan para
+# no servir las odds a bots (navigator.webdriver, plugins vacíos, etc.).
+STEALTH_JS = r"""
+Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3,4,5]});
+Object.defineProperty(navigator, 'languages', {get: () => ['en-US','en']});
+window.chrome = { runtime: {} };
+const _q = window.navigator.permissions && window.navigator.permissions.query;
+if (_q) window.navigator.permissions.query = (p) =>
+    p && p.name === 'notifications'
+      ? Promise.resolve({state: Notification.permission})
+      : _q(p);
+"""
+
+
+def _dismiss_consent(page) -> bool:
+    """Acepta el banner de cookies (OneTrust u otros) que bloquea el contenido."""
+    sels = [
+        "#onetrust-accept-btn-handler",
+        "button:has-text('Accept All')",
+        "button:has-text('I Accept')",
+        "button:has-text('Accept')",
+        "button:has-text('Aceptar')",
+    ]
+    for s in sels:
+        try:
+            btn = page.locator(s).first
+            if btn.count() and btn.is_visible(timeout=1500):
+                btn.click(timeout=2500)
+                page.wait_for_timeout(1200)
+                return True
+        except Exception:
+            continue
+    return False
+
+
 def diagnose(pw, sport: str, league_url: str) -> dict:
     browser = pw.chromium.launch(headless=True, args=[
         "--no-sandbox", "--disable-blink-features=AutomationControlled",
+        "--disable-dev-shm-usage",
     ])
     ctx = browser.new_context(
         locale="en-US", timezone_id="America/New_York",
@@ -89,35 +126,54 @@ def diagnose(pw, sport: str, league_url: str) -> dict:
         user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
     )
+    ctx.add_init_script(STEALTH_JS)
     page = ctx.new_page()
     result: dict = {"sport": sport, "league_url": league_url,
                     "scraped_utc": datetime.now(timezone.utc).isoformat()}
     try:
         page.goto(league_url, wait_until="domcontentloaded", timeout=60000)
-        page.wait_for_timeout(4000)
+        result["consent_league"] = _dismiss_consent(page)
+        page.wait_for_timeout(3000)
         result["league_title"] = page.title()
         result["league_final_url"] = page.url  # ¿redirigió a MX?
-        # links a partidos de esta liga
         hrefs = page.eval_on_selector_all(
             "a[href]", "els => els.map(a => a.getAttribute('href'))")
-        pat = "/baseball/" if sport == "mlb" else "/american-football/"
-        matches = [h for h in hrefs if h and "/h2h/" in h and pat.split("/")[1] in h]
+        pat = "baseball" if sport == "mlb" else "american-football"
+        matches = [h for h in hrefs if h and "/h2h/" in h and pat in h]
         matches = list(dict.fromkeys(matches))
         result["n_matches"] = len(matches)
         result["match_sample"] = matches[:5]
-        # abrir un partido y diagnosticar su tabla de odds
         if matches:
             m = matches[0]
             murl = m if m.startswith("http") else "https://www.oddsportal.com" + m
             page.goto(murl, wait_until="domcontentloaded", timeout=60000)
-            page.wait_for_timeout(6000)   # dar tiempo a decodificar/renderizar odds
+            result["consent_match"] = _dismiss_consent(page)
+            # esperar a que aparezcan cuotas (o vencer el timeout)
+            odds_rendered = False
             try:
-                page.mouse.wheel(0, 1200)
-                page.wait_for_timeout(3000)
+                page.wait_for_function(
+                    "() => Array.from(document.querySelectorAll('p,span,a,div'))"
+                    ".some(e => /^\\d{1,2}\\.\\d{2}$/.test((e.textContent||'').trim()))",
+                    timeout=25000)
+                odds_rendered = True
             except Exception:
                 pass
+            result["odds_rendered"] = odds_rendered
+            for _ in range(3):
+                try:
+                    page.mouse.wheel(0, 1400)
+                except Exception:
+                    pass
+                page.wait_for_timeout(1500)
             result["match_url"] = murl
             result["match_diag"] = page.evaluate(EXTRACT_JS)
+            # dump de HTML del área principal para ver qué hay si aún no rinde
+            try:
+                html = page.content()
+                result["content_len"] = len(html)
+                (DEBUG / f"{sport}_match.html").write_text(html[:200000], encoding="utf-8")
+            except Exception:
+                pass
             page.screenshot(path=str(DEBUG / f"{sport}_match.png"), full_page=False)
     except Exception as e:  # noqa: BLE001
         result["error"] = f"{type(e).__name__}: {e}"
