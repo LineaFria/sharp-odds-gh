@@ -146,7 +146,21 @@ def diagnose(pw, sport: str, league_url: str) -> dict:
         if matches:
             m = matches[0]
             murl = m if m.startswith("http") else "https://www.oddsportal.com" + m
-            page.goto(murl, wait_until="domcontentloaded", timeout=60000)
+            # NAVEGACIÓN POR CLIC (dentro de la SPA): algunos sitios sirven vacío al
+            # deep-link directo pero cargan bien la navegación interna. Fallback a goto.
+            clicked = False
+            try:
+                link = page.locator("a[href*='/h2h/']").first
+                if link.count():
+                    link.scroll_into_view_if_needed(timeout=4000)
+                    link.click(timeout=6000)
+                    page.wait_for_timeout(3000)
+                    clicked = "/h2h/" in page.url
+            except Exception:
+                clicked = False
+            result["clicked_nav"] = clicked
+            if not clicked:
+                page.goto(murl, wait_until="domcontentloaded", timeout=60000)
             result["consent_match"] = _dismiss_consent(page)
             # esperar a que aparezcan cuotas (o vencer el timeout)
             odds_rendered = False
