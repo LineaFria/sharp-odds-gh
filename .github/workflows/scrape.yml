@@ -5,11 +5,9 @@ name: scrape-sharp-odds
 # resultado en debug/ para poder construir el extractor real.
 
 on:
-  workflow_dispatch:        # correr a mano desde la pestaña Actions
-  push:
-    branches: [main]        # dispara en cada push (el commit del bot NO re-dispara: GH lo evita)
-  schedule:
-    - cron: "20 */3 * * *"  # cada 3h (UTC). Ajustable cuando el extractor funcione.
+  workflow_dispatch:        # SOLO manual. Auto-triggers apagados: OddsPortal bloquea al
+                            # bot (sirve página vacía a datacenter/Azure) -> no viable.
+                            # Ver README: se pivotó a otra fuente sharp.
 
 permissions:
   contents: write           # para commitear los resultados de vuelta al repo
