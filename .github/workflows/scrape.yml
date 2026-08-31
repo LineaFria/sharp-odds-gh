@@ -1,0 +1,49 @@
+name: scrape-sharp-odds
+
+# Corre en runners de GitHub (IP EE.UU.) -> OddsPortal muestra la versión internacional
+# CON Pinnacle. v1 = diagnóstico: confirma si el runner ve las odds/Pinnacle y publica el
+# resultado en debug/ para poder construir el extractor real.
+
+on:
+  workflow_dispatch:        # correr a mano desde la pestaña Actions
+  schedule:
+    - cron: "20 */3 * * *"  # cada 3h (UTC). Ajustable cuando el extractor funcione.
+
+permissions:
+  contents: write           # para commitear los resultados de vuelta al repo
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps + Chromium
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Run scraper (diagnóstico)
+        run: python scraper.py mlb nfl
+
+      - name: Upload screenshots (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: debug/*.png
+          if-no-files-found: ignore
+
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name  "sharp-odds-bot"
+          git config user.email "actions@github.com"
+          git add -A data debug || true
+          git commit -m "scrape run $(date -u +%FT%TZ)" || echo "sin cambios"
+          git push || echo "push falló (nada que subir)"
