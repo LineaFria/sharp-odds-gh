@@ -1,11 +1,11 @@
 {
   "sport": "nfl",
   "league_url": "https://www.oddsportal.com/american-football/usa/nfl/",
-  "scraped_utc": "2026-08-31T17:34:47.217790+00:00",
+  "scraped_utc": "2026-08-31T17:38:31.492194+00:00",
   "consent_league": false,
   "league_title": "NFL Odds: Spreads, Moneylines and Game Lines",
   "league_final_url": "https://www.oddsportal.com/american-football/usa/nfl/",
-  "n_matches": 34,
+  "n_matches": 282,
   "match_sample": [
     "/american-football/h2h/new-england-patriots-G6oNfmi8/seattle-seahawks-f5h1oOee/#GQtrH2RF",
     "/american-football/h2h/los-angeles-rams-z7hZioyR/san-francisco-49ers-jBnfYoFr/#OjpjFtdS",
@@ -13,6 +13,7 @@
     "/american-football/h2h/baltimore-ravens-pUern3T0/indianapolis-colts-OOp2WPqe/#OjQhOJYr",
     "/american-football/h2h/buffalo-bills-t2lcn4tk/houston-texans-SIj9q2Q7/#h8ZMTuBL"
   ],
+  "clicked_nav": true,
   "consent_match": false,
   "odds_rendered": false,
   "match_url": "https://www.oddsportal.com/american-football/h2h/new-england-patriots-G6oNfmi8/seattle-seahawks-f5h1oOee/#GQtrH2RF",

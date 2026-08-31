@@ -1,7 +1,7 @@
 {
   "sport": "mlb",
   "league_url": "https://www.oddsportal.com/baseball/usa/mlb/",
-  "scraped_utc": "2026-08-31T17:34:11.984767+00:00",
+  "scraped_utc": "2026-08-31T17:37:54.256325+00:00",
   "consent_league": false,
   "league_title": "MLB Betting Odds & Fixtures, Baseball USA | OddsPortal",
   "league_final_url": "https://www.oddsportal.com/baseball/usa/mlb/",
@@ -13,6 +13,7 @@
     "/baseball/h2h/boston-red-sox-zaXTinF3/seattle-mariners-txYPhSac/#U5ihcYzp",
     "/baseball/h2h/miami-marlins-ddxzWOqT/washington-nationals-CE026gRp/#IRXnJFc3"
   ],
+  "clicked_nav": true,
   "consent_match": false,
   "odds_rendered": false,
   "match_url": "https://www.oddsportal.com/baseball/h2h/atlanta-braves-0UPxbDYA/san-francisco-giants-bRZ9b6xj/#rcmsx5XG",
