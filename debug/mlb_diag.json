@@ -1,0 +1,32 @@
+{
+  "sport": "mlb",
+  "league_url": "https://www.oddsportal.com/baseball/usa/mlb/",
+  "scraped_utc": "2026-08-31T17:34:11.984767+00:00",
+  "consent_league": false,
+  "league_title": "MLB Betting Odds & Fixtures, Baseball USA | OddsPortal",
+  "league_final_url": "https://www.oddsportal.com/baseball/usa/mlb/",
+  "n_matches": 14,
+  "match_sample": [
+    "/baseball/h2h/atlanta-braves-0UPxbDYA/san-francisco-giants-bRZ9b6xj/#rcmsx5XG",
+    "/baseball/h2h/cincinnati-reds-EkWXj6U9/san-diego-padres-8poQN9Ud/#bN0M2fDM",
+    "/baseball/h2h/new-york-mets-I5wWW4UM/tampa-bay-rays-GCHgI4hp/#jLu1eC5d",
+    "/baseball/h2h/boston-red-sox-zaXTinF3/seattle-mariners-txYPhSac/#U5ihcYzp",
+    "/baseball/h2h/miami-marlins-ddxzWOqT/washington-nationals-CE026gRp/#IRXnJFc3"
+  ],
+  "consent_match": false,
+  "odds_rendered": false,
+  "match_url": "https://www.oddsportal.com/baseball/h2h/atlanta-braves-0UPxbDYA/san-francisco-giants-bRZ9b6xj/#rcmsx5XG",
+  "match_diag": {
+    "body_len": 0,
+    "mentions_pinnacle": false,
+    "books_in_text": [],
+    "book_img_alts": [],
+    "all_img_alts": [],
+    "price_count": 0,
+    "price_sample": [],
+    "bookmaker_links": [],
+    "title": "",
+    "url": "https://www.oddsportal.com/baseball/h2h/atlanta-braves-0UPxbDYA/san-francisco-giants-bRZ9b6xj/#rcmsx5XG"
+  },
+  "content_len": 39
+}
